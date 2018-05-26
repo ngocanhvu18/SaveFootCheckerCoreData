@@ -10,11 +10,18 @@ import UIKit
 import CoreData
 
 class MasterViewController: UITableViewController {
-var getdata = DataService.share.fetchResultController
+    var searchController: UISearchController!
+    
+    var filterData : [String]?
+    
+    @IBOutlet var tableViewController: UITableView!
+    
+var fetchResultController = DataService.share.fetchResultController
     override func viewDidLoad() {
         super.viewDidLoad()
-        getdata.delegate = self
-
+        fetchResultController.delegate = self
+        
+    
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
 
@@ -31,18 +38,18 @@ var getdata = DataService.share.fetchResultController
 
     override func numberOfSections(in tableView: UITableView) -> Int {
         // #warning Incomplete implementation, return the number of sections
-        return getdata.sections?.count ?? 0
+        return fetchResultController.sections?.count ?? 0
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        return getdata.sections![section].numberOfObjects
+        return fetchResultController.sections![section].numberOfObjects
     }
 
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! MealViewCell
-        let entity = getdata.object(at: indexPath)
+        let entity = fetchResultController.object(at: indexPath)
         configureCell(cell, withEntity: entity)
 
         return cell
@@ -52,6 +59,7 @@ var getdata = DataService.share.fetchResultController
         cell.rantingController.rating = Int(entity.ranting)
         cell.photoView?.image = entity.photo as? UIImage
     }
+     // seach data
     
 
     /*
@@ -61,13 +69,15 @@ var getdata = DataService.share.fetchResultController
         return true
     }
     */
-    
+  
     
     // Override to support editing the table view.
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
             DataService.share.removeData(from: indexPath)
+           
         } else if editingStyle == .insert {
+            
             // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
         }    
     }
@@ -77,7 +87,7 @@ var getdata = DataService.share.fetchResultController
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if let masterViewController = segue.destination as? DetailViewController{
             if let indexPath = tableView.indexPathForSelectedRow{
-                masterViewController.entity = getdata.object(at: indexPath)
+                masterViewController.entity = fetchResultController.object(at: indexPath)
             }
         }
         // Get the new view controller using segue.destinationViewController.
@@ -111,3 +121,4 @@ extension MasterViewController : NSFetchedResultsControllerDelegate {
         tableView.endUpdates()
     }
 }
+
