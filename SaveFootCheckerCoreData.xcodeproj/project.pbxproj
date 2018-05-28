@@ -65,6 +65,7 @@
 			isa = PBXGroup;
 			children = (
 				2F07019D20B7F0BB000FA0E0 /* AppDelegate.swift */,
+				2F0701B520B7F633000FA0E0 /* View */,
 				2F180B2020B813900042BD7B /* DataService */,
 				2F0701B420B7F5CB000FA0E0 /* ViewController */,
 				2F0701A120B7F0BB000FA0E0 /* Main.storyboard */,
@@ -98,7 +99,6 @@
 			isa = PBXGroup;
 			children = (
 				2F180B2120B813AE0042BD7B /* DataService.swift */,
-				2F0701B520B7F633000FA0E0 /* View */,
 			);
 			path = DataService;
 			sourceTree = "<group>";

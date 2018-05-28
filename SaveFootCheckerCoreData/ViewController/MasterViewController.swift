@@ -11,18 +11,22 @@ import CoreData
 
 class MasterViewController: UITableViewController {
     
-
+    var fetchResultController = DataService.share.fetchResultController
     var searchController: UISearchController!
-//    var entity : [Entity] = []
-    var filterEntity : [String]?
-    
-    @IBOutlet var tableViewController: UITableView!
-    @IBOutlet weak var search: UISearchBar!
-    
-var fetchResultController = DataService.share.fetchResultController
+    var entity : [Entity] = []
+//    @IBOutlet var tableViewController: UITableView!
     override func viewDidLoad() {
         super.viewDidLoad()
         fetchResultController.delegate = self
+        // set searchBar
+        searchController = UISearchController(searchResultsController: nil)
+        searchController.searchBar.placeholder = "Search Meal"
+        searchController.searchResultsUpdater = self
+        searchController.obscuresBackgroundDuringPresentation = true
+        searchController.dimsBackgroundDuringPresentation = false
+        tableView.tableHeaderView = searchController.searchBar
+        
+        navigationItem.hidesSearchBarWhenScrolling = true
         
     
         // Uncomment the following line to preserve selection between presentations
@@ -46,19 +50,23 @@ var fetchResultController = DataService.share.fetchResultController
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
+        if searchController.isActive {
+            return entity.count
+        }
         return fetchResultController.sections![section].numberOfObjects
     }
 
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! MealViewCell
-        let entity = fetchResultController.object(at: indexPath)
-        configureCell(cell, withEntity: entity)
+        let filterEntity = searchController.isActive ? entity[indexPath.row] : fetchResultController.object(at: indexPath)
+        configureCell(cell, withEntity: filterEntity)
 
         return cell
     }
+    
     func configureCell(_ cell: MealViewCell, withEntity entity: Entity) {
-        cell.labelName!.text = entity.text
+        cell.labelName!.text = entity.name
         cell.rantingController.rating = Int(entity.ranting)
         cell.photoView?.image = entity.photo as? UIImage
     }
@@ -90,7 +98,9 @@ var fetchResultController = DataService.share.fetchResultController
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if let masterViewController = segue.destination as? DetailViewController{
             if let indexPath = tableView.indexPathForSelectedRow{
-                masterViewController.entity = fetchResultController.object(at: indexPath)
+                let filterEntity = searchController.isActive ? entity[indexPath.row] : fetchResultController.object(at: indexPath)
+                masterViewController.entity = filterEntity
+                searchController.isActive = false
             }
         }
         // Get the new view controller using segue.destinationViewController.
@@ -124,4 +134,14 @@ extension MasterViewController : NSFetchedResultsControllerDelegate {
         tableView.endUpdates()
     }
 }
-
+extension MasterViewController: UISearchResultsUpdating{
+    func updateSearchResults(for searchController: UISearchController) {
+        if let searchtext = searchController.searchBar.text{
+            let context = fetchResultController.fetchedObjects ?? []
+             entity = context.filter({(data) -> Bool in
+                return data.name?.range(of: searchtext, options: .caseInsensitive, range: nil, locale: nil) != nil
+             })
+            tableView.reloadData()
+        }
+    }
+}

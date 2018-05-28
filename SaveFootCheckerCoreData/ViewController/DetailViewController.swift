@@ -11,6 +11,7 @@ import UIKit
 class DetailViewController: UIViewController,  UIImagePickerControllerDelegate, UINavigationControllerDelegate , UITextFieldDelegate
 {
     var entity : Entity?
+    
     @IBOutlet weak var saveButton: UIBarButtonItem!
     
     @IBOutlet weak var imageView: UIImageView!
@@ -27,7 +28,7 @@ class DetailViewController: UIViewController,  UIImagePickerControllerDelegate, 
     }
     func configure(){
         if entity != nil {
-            nameTextField.text = entity?.text
+            nameTextField.text = entity?.name
             ratingcontroller.rating = Int(entity?.ranting ?? 0)
             imageView.image = entity?.photo as? UIImage
             
@@ -62,12 +63,12 @@ class DetailViewController: UIViewController,  UIImagePickerControllerDelegate, 
 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if let masterViewController = segue.destination as? MasterViewController {
-            if masterViewController.tableView.indexPathForSelectedRow == nil {
+            if masterViewController.tableView.indexPathForSelectedRow == nil && entity == nil {
                 // NewValue
-                entity = Entity(context: AppDelegate.context)
+                entity = Entity(context: masterViewController.fetchResultController.managedObjectContext)
             }
             entity?.ranting = Int32(ratingcontroller.rating)
-            entity?.text = nameTextField.text
+            entity?.name  = nameTextField.text
             entity?.photo = imageView.image
             DataService.share.saveToCoreData()
         }
