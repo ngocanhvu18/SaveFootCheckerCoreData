@@ -10,11 +10,14 @@ import UIKit
 import CoreData
 
 class MasterViewController: UITableViewController {
-    var searchController: UISearchController!
     
-    var filterData : [String]?
+
+    var searchController: UISearchController!
+//    var entity : [Entity] = []
+    var filterEntity : [String]?
     
     @IBOutlet var tableViewController: UITableView!
+    @IBOutlet weak var search: UISearchBar!
     
 var fetchResultController = DataService.share.fetchResultController
     override func viewDidLoad() {
@@ -59,7 +62,7 @@ var fetchResultController = DataService.share.fetchResultController
         cell.rantingController.rating = Int(entity.ranting)
         cell.photoView?.image = entity.photo as? UIImage
     }
-     // seach data
+    
     
 
     /*
